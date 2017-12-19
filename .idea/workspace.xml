@@ -31,11 +31,23 @@
       <file leaf-file-name="App.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/App.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="13" lean-forward="false" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+            <state relative-caret-position="120">
+              <caret line="8" column="72" lean-forward="true" selection-start-line="8" selection-start-column="72" selection-end-line="8" selection-end-column="72" />
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
+                <element signature="e#130#179#0" expanded="true" />
+                <element signature="e#311#370#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="catalog.json" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/catalog.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-36678">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -153,12 +165,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1513688837613</updated>
-      <workItem from="1513688839054" duration="1285000" />
+      <workItem from="1513688839054" duration="1648000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1285000" />
+    <option name="totallyTimeSpent" value="1648000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1653" y="45" width="1599" height="990" extended-state="0" />
@@ -203,12 +215,22 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/catalog.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-36678">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/App.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="13" lean-forward="false" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+        <state relative-caret-position="120">
+          <caret line="8" column="72" lean-forward="true" selection-start-line="8" selection-start-column="72" selection-end-line="8" selection-end-column="72" />
           <folding>
             <element signature="e#0#41#0" expanded="true" />
+            <element signature="e#130#179#0" expanded="true" />
+            <element signature="e#311#370#0" expanded="true" />
           </folding>
         </state>
       </provider>
