@@ -38,6 +38,26 @@ const afm = {
 const transformation = {};
 const projectId = "la84vcyhrq8jwbu4wpipw66q2sqeb923";
 
+function ListItem(props) {
+    // Correct! There is no need to specify the key here:
+    return <li>{props.value}</li>;
+}
+
+function NumberList(props) {
+    const numbers = props.numbers;
+    const listItems = numbers.map((number) =>
+        // Correct! Key should be specified inside the array.
+        <ListItem key={number.toString()}
+                  value={number} />
+
+    );
+    return (
+        <ul>
+            {listItems}
+        </ul>
+    );
+}
+
 //start the app
 class App extends Component {
     constructor(props) {
@@ -46,7 +66,6 @@ class App extends Component {
     }
 
     async componentDidMount() {
-        var self = this;
         //get data directly from the project data layer of goodData SDK
         const adapter = new SimpleExecutorAdapter(sdk, 'la84vcyhrq8jwbu4wpipw66q2sqeb923');
         const dataTable = new DataTable(adapter);
@@ -62,6 +81,17 @@ class App extends Component {
 
         //executing data request with given afm format and wait for it to finish
         await dataTable.getData(afm, transformation);
+    }
+
+    dataObject(){
+        return this.state.data.rawData.map((entry) => {
+            return (
+                <p style={{ textAlign: 'left', paddingLeft: '40%'}}>
+                    <span> key: {entry[0].name} </span>,
+                    <span> value: {entry[1]} </span>
+                </p>
+            )
+        })
     }
 
     render() {
@@ -95,7 +125,8 @@ class App extends Component {
                       }
                   }}
               />*/}
-              <h3>This is a GoodData raw: {this.state.data ? 'yep' : 'nope' } </h3>
+              <h3>This is a GoodData raw: </h3>
+              {this.state.data ? this.dataObject() : 'not there yet' }
               <h3>This is a GoodData component for bar charts </h3>
               <BarChart
                   afm={afm}
