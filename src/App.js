@@ -40,55 +40,63 @@ const projectId = "la84vcyhrq8jwbu4wpipw66q2sqeb923";
 
 //start the app
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React, servant!</h1>
-        </header>
+    constructor(props) {
+        super(props);
+    }
 
-    {/*    //Failing due to TypeError
-           <Execute afm={afm} projectId={projectId}> onLoadingChanged={e=>{}} onError={e=>{}}>
-              {
-                  (executionResult) => {
-                      console.log(executionResult);
-                  }
-              }
-          </Execute>*/}
-          <h3>This is a GoodData component for a single KPI: </h3>
-          <Kpi
-              projectId="la84vcyhrq8jwbu4wpipw66q2sqeb923"
-              measure={C.metric('Avg Deal Size')} />
-          {/*
-          <h3>This is a GoodData component for table: </h3>
-          <Visualization
-              projectId="la84vcyhrq8jwbu4wpipw66q2sqeb923"
-              identifier={C.visualization('Revenue by Region')}
-              config={{
-                  colors: ['rgba(195, 49, 73, 1)', 'rgba(168, 194, 86, 1)'],
-                  legend: {
-                      enabled: true,
-                      position: 'bottom'
-                  }
-              }}
-          />*/}
-          <h3>This is a GoodData component for bar charts: </h3>
-          <BarChart
-              afm={afm}
-              projectId="la84vcyhrq8jwbu4wpipw66q2sqeb923"
-              transformation={{
-                  measures: [
-                      {
-                          id: 'CustomMeasureID',
-                          title: '# of Activities'
+    getInititalData() {
+        //get data directly from the project data layer of goodData SDK
+        const adapter = new SimpleExecutorAdapter(sdk, 'la84vcyhrq8jwbu4wpipw66q2sqeb923');
+        const dataTable = new DataTable(adapter);
+
+        //define what to do with callbacks for success and failed data request
+        dataTable.onData((data) => {
+                console.log("This is da amazing daaaaaaaata:");
+                console.log(data);
+            }
+        );
+        dataTable.onError((err) => console.error(err));
+
+        //executing data request with given afm format
+        dataTable.getData(afm, transformation);
+    }
+
+    render() {
+        this.getInititalData();
+        return (
+          <div className="App">
+            <header className="App-header">
+              <img src={logo} className="App-logo" alt="logo" />
+              <h1 className="App-title">Welcome to React, servant!</h1>
+            </header>
+
+        {/*    //Failing due to TypeError
+               <Execute afm={afm} projectId={projectId}> onLoadingChanged={e=>{}} onError={e=>{}}>
+                  {
+                      (executionResult) => {
+                          console.log(executionResult);
                       }
-                  ]
-              }}
-          />
-         {/* <div>
-              <h3>This is a GoodData component for pie charts: </h3>
-              <PieChart
+                  }
+              </Execute>*/}
+              <h3>This is a GoodData component for a single KPI: </h3>
+              <Kpi
+                  projectId="la84vcyhrq8jwbu4wpipw66q2sqeb923"
+                  measure={C.metric('Avg Deal Size')} />
+              {/*
+              <h3>This is a GoodData component for table: </h3>
+              <Visualization
+                  projectId="la84vcyhrq8jwbu4wpipw66q2sqeb923"
+                  identifier={C.visualization('Revenue by Region')}
+                  config={{
+                      colors: ['rgba(195, 49, 73, 1)', 'rgba(168, 194, 86, 1)'],
+                      legend: {
+                          enabled: true,
+                          position: 'bottom'
+                      }
+                  }}
+              />*/}
+              <h3>This is a GoodData component for bar charts: </h3>
+              <BarChart
                   afm={afm}
                   projectId="la84vcyhrq8jwbu4wpipw66q2sqeb923"
                   transformation={{
@@ -100,25 +108,25 @@ class App extends Component {
                       ]
                   }}
               />
-          </div>*/}
-      </div>
-    );
-  }
-}
-//get data directly from the project data layer of goodData SDK
-const adapter = new SimpleExecutorAdapter(sdk, 'la84vcyhrq8jwbu4wpipw66q2sqeb923');
-const dataTable = new DataTable(adapter);
+             {/* <div>
+                  <h3>This is a GoodData component for pie charts: </h3>
+                  <PieChart
+                      afm={afm}
+                      projectId="la84vcyhrq8jwbu4wpipw66q2sqeb923"
+                      transformation={{
+                          measures: [
+                              {
+                                  id: 'CustomMeasureID',
+                                  title: '# of Activities'
+                              }
+                          ]
+                      }}
+                  />
+              </div>*/}
 
-//define what to do with callbacks for success and failed data request
-dataTable.onData((data) => {
-        console.log("This is da amazing daaaaaaaata:");
-        console.log(data);
+          </div>
+        );
     }
-);
-dataTable.onError((err) => console.error(err));
-
-//executing data request with given afm format
-dataTable.getData(afm, transformation);
-
+}
 
 export default App;
