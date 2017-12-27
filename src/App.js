@@ -42,9 +42,11 @@ const projectId = "la84vcyhrq8jwbu4wpipw66q2sqeb923";
 class App extends Component {
     constructor(props) {
         super(props);
+        this.state = {};
     }
 
-    getInititalData() {
+    async componentDidMount() {
+        var self = this;
         //get data directly from the project data layer of goodData SDK
         const adapter = new SimpleExecutorAdapter(sdk, 'la84vcyhrq8jwbu4wpipw66q2sqeb923');
         const dataTable = new DataTable(adapter);
@@ -53,16 +55,16 @@ class App extends Component {
         dataTable.onData((data) => {
                 console.log("This is da amazing daaaaaaaata:");
                 console.log(data);
+                this.setState({data: data});
             }
         );
         dataTable.onError((err) => console.error(err));
 
-        //executing data request with given afm format
-        dataTable.getData(afm, transformation);
+        //executing data request with given afm format and wait for it to finish
+        await dataTable.getData(afm, transformation);
     }
 
     render() {
-        this.getInititalData();
         return (
           <div className="App">
             <header className="App-header">
@@ -70,19 +72,17 @@ class App extends Component {
               <h1 className="App-title">Welcome to React, servant!</h1>
             </header>
 
-        {/*    //Failing due to TypeError
-               <Execute afm={afm} projectId={projectId}> onLoadingChanged={e=>{}} onError={e=>{}}>
+        {/*    <Execute afm={afm} projectId={projectId}> onLoadingChanged={e=>{}} onError={e=>{}}>
                   {
                       (executionResult) => {
                           console.log(executionResult);
                       }
                   }
-              </Execute>*/}
+              </Execute>
               <h3>This is a GoodData component for a single KPI: </h3>
               <Kpi
                   projectId="la84vcyhrq8jwbu4wpipw66q2sqeb923"
                   measure={C.metric('Avg Deal Size')} />
-              {/*
               <h3>This is a GoodData component for table: </h3>
               <Visualization
                   projectId="la84vcyhrq8jwbu4wpipw66q2sqeb923"
@@ -95,7 +95,8 @@ class App extends Component {
                       }
                   }}
               />*/}
-              <h3>This is a GoodData component for bar charts: </h3>
+              <h3>This is a GoodData raw: {this.state.data ? 'yep' : 'nope' } </h3>
+              <h3>This is a GoodData component for bar charts </h3>
               <BarChart
                   afm={afm}
                   projectId="la84vcyhrq8jwbu4wpipw66q2sqeb923"
