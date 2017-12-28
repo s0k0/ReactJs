@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { scaleLinear } from 'd3-scale'
+import { max } from 'd3-array'
+import { select } from 'd3-selection'
 
 //get data layer access
 import { DataTable, SimpleExecutorAdapter } from '@gooddata/data-layer';
@@ -43,7 +46,10 @@ const projectId = "la84vcyhrq8jwbu4wpipw66q2sqeb923";
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            values: [],
+            attributes: []
+        };
     }
 
     componentDidMount() {
@@ -55,12 +61,25 @@ class App extends Component {
         dataTable.onData((data) => {
                 console.log(data);
                 this.setState({data: data}); //load data from GoodData API into component state
+                this.assembleDataArray()
             }
         );
         dataTable.onError((err) => console.error(err));
 
         //executing data request with given attribute-filter-model (afm) format and transformation
         dataTable.getData(afm, transformation);
+
+    }
+
+    assembleDataArray(){
+        const values = []
+        const attributes = []
+        this.state.data.rawData.map((entry) => {
+            attributes.push(entry[0].name)
+            values.push(parseInt(entry[1]))
+        })
+        this.setState({values: values})
+        this.setState({attributes: attributes})
     }
 
     //deliver DOM element containing raw data provided request results
@@ -73,6 +92,46 @@ class App extends Component {
                 </p>
             )
         })
+    }
+
+    //deliver DOM element containing the bar chart created with D3js from raw data
+    renderBarChartD3js(){
+        this.createBarChartD3js()
+        return <svg ref={node => this.node = node}
+                    width={500} height={500}>
+        </svg>
+    }
+
+    //create bar chart using D3js
+    createBarChartD3js() {
+        const node = this.node
+        const size =[500,500]
+        const dataMax = max(this.state.values)
+        console.log(this.state.values)
+        console.log(dataMax)
+        const yScale = scaleLinear()
+            .domain([0, dataMax])
+            .range([0, size[1]])
+        select(node)
+            .selectAll('rect')
+            .data(this.state.values)
+            .enter()
+            .append('rect')
+
+        select(node)
+            .selectAll('rect')
+            .data(this.state.values)
+            .exit()
+            .remove()
+
+        select(node)
+            .selectAll('rect')
+            .data(this.state.values)
+            .style('fill', '#fe9922')
+            .attr('x', (d,i) => i * 25)
+            .attr('y', d => size[1] - yScale(d) )
+            .attr('height', d => yScale(d))
+            .attr('width', 25)
     }
 
     render() {
@@ -108,6 +167,8 @@ class App extends Component {
               />*/}
               <h3>This is a GoodData raw: </h3>
               {this.state.data ? this.dataObject() : 'not there yet' }
+              <h3>This is a GoodData raw as D3Js bar chart: </h3>
+              {this.state.data? this.renderBarChartD3js() : 'not there yet' }
               <h3>This is a GoodData component for bar charts </h3>
               <BarChart
                   afm={afm}
