@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { scaleLinear } from 'd3-scale'
+
+//load d3js dependencies
+import { scaleLinear,scaleBand } from 'd3-scale'
 import { max } from 'd3-array'
 import { select } from 'd3-selection'
+import { axisLeft, axisBottom } from 'd3-axis'
 
 //get data layer access
 import { DataTable, SimpleExecutorAdapter } from '@gooddata/data-layer';
@@ -48,7 +51,7 @@ class App extends Component {
         super(props);
         this.state = {
             values: [],
-            attributes: []
+            labels: []
         };
     }
 
@@ -68,18 +71,17 @@ class App extends Component {
 
         //executing data request with given attribute-filter-model (afm) format and transformation
         dataTable.getData(afm, transformation);
-
     }
 
     assembleDataArray(){
         const values = []
-        const attributes = []
+        const labels = []
         this.state.data.rawData.map((entry) => {
-            attributes.push(entry[0].name)
+            labels.push(entry[0].name)
             values.push(parseInt(entry[1]))
         })
         this.setState({values: values})
-        this.setState({attributes: attributes})
+        this.setState({labels: labels})
     }
 
     //deliver DOM element containing raw data provided request results
@@ -87,7 +89,7 @@ class App extends Component {
         return this.state.data.rawData.map((entry) => {
             return (
                 <p style={{ textAlign: 'left', paddingLeft: '40%'}}>
-                    <span> attribute: {entry[0].name} </span>,
+                    <span> label: {entry[0].name} </span>,
                     <span> value: {entry[1]} </span>
                 </p>
             )
@@ -99,39 +101,49 @@ class App extends Component {
         this.createBarChartD3js()
         return <svg ref={node => this.node = node}
                     width={500} height={500}>
+
         </svg>
     }
 
     //create bar chart using D3js
     createBarChartD3js() {
         const node = this.node
-        const size =[500,500]
-        const dataMax = max(this.state.values)
-        console.log(this.state.values)
-        console.log(dataMax)
+        const size =[400,400]
+        const valueMax = max(this.state.values)
+        const barWidth = size[0]/this.state.values.length
+        const margin = {top: 20, right:20, bottom:30, left:40}
+
         const yScale = scaleLinear()
-            .domain([0, dataMax])
-            .range([0, size[1]])
+            .domain([0,valueMax])
+            .range([size[1],0])
+
+        const xScale = scaleBand()
+            .domain(this.state.labels)
+            .range([margin.left, size[0] - margin.right])
+
+        const yAxis = axisLeft(yScale)
+        const xAxis = axisBottom(xScale)
+
         select(node)
             .selectAll('rect')
             .data(this.state.values)
             .enter()
             .append('rect')
+            .attr('x', (d,i) => margin.left * 2 + i * barWidth)
+            .attr('y', d => yScale(d))
+            .attr('height', d => yScale(0) - yScale(d))
+            .attr('width', barWidth/2)
+            .attr('fill', '#fe9922')
 
         select(node)
-            .selectAll('rect')
-            .data(this.state.values)
-            .exit()
-            .remove()
+            .append("g")
+            .attr("transform", "translate("+ margin.left +",0)")
+            .call(yAxis)
 
         select(node)
-            .selectAll('rect')
-            .data(this.state.values)
-            .style('fill', '#fe9922')
-            .attr('x', (d,i) => i * 25)
-            .attr('y', d => size[1] - yScale(d) )
-            .attr('height', d => yScale(d))
-            .attr('width', 25)
+            .append("g")
+            .attr("transform", "translate(0,"+ size[0] +")")
+            .call(xAxis)
     }
 
     render() {

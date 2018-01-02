@@ -6,6 +6,7 @@
     "@gooddata/react-components": "^2.9.2",
     "d3": "4.12.2",
     "react": "15",
+    "react-d3-axis": "0.1.1",
     "react-dom": "15",
     "react-scripts": "1.0.17"
   },
