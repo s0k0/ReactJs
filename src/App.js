@@ -155,23 +155,29 @@ class App extends Component {
               <img src={logo} className="App-logo" alt="logo" />
               <h1 className="App-title">Welcome to React, servant!</h1>
             </header>
-              <h3>This is a GoodData raw: </h3>
-              {this.state.data ? this.dataObject() : 'not there yet' }
-              <h3>This is a GoodData raw as D3Js bar chart: </h3>
-              {this.state.data? this.renderBarChartD3js() : 'not there yet' }
-              <h3>This is a GoodData component for bar charts </h3>
-              <BarChart
-                  afm={afm}
-                  projectId= {projectId}
-                  transformation={{
-                      measures: [
-                          {
-                              id: 'CustomMeasureID',
-                              title: '# of Activities'
-                          }
-                      ]
-                  }}
-              />
+            <div className="App-body" style={{ display: 'flex', justifyContent: 'space-around'}}>
+                <span className="Custom-Chart" style={{ width: '100%'}}>
+                    <h3>This is a GoodData raw: </h3>
+                    {this.state.data ? this.dataObject() : 'not there yet' }
+                    <h3>This is a GoodData raw as D3Js bar chart: </h3>
+                    {this.state.data? this.renderBarChartD3js() : 'not there yet' }
+                </span>
+                <span className="SDK-Chart" style={{ width: '100%'}}>
+                  <h3>This is a GoodData component for bar charts: </h3>
+                  <BarChart
+                      afm={afm}
+                      projectId= {projectId}
+                      transformation={{
+                          measures: [
+                              {
+                                  id: 'CustomMeasureID',
+                                  title: '# of Activities'
+                              }
+                          ]
+                      }}
+                  />
+                </span>
+            </div>
           </div>
         );
     }
