@@ -4,26 +4,22 @@ import './App.css';
 
 //load d3js dependencies
 import { scaleLinear,scaleBand } from 'd3-scale'
-import { max } from 'd3-array'
+import { max, min } from 'd3-array'
 import { select } from 'd3-selection'
 import { axisLeft, axisBottom } from 'd3-axis'
 
 //get data layer access
 import { DataTable, SimpleExecutorAdapter } from '@gooddata/data-layer';
 import * as sdk from 'gooddata';
+import { config } from 'gooddata';
 
 //fetch react components for rendering charts or other visualizations
-import { Kpi, Visualization, AfmComponents, Execute } from '@gooddata/react-components';
+import { AfmComponents } from '@gooddata/react-components';
 import '@gooddata/react-components/styles/css/main.css';
 
-//optional: exports data format of project with all attributes and store in a json file using
-// > gdc-catalog-export --project-id la84vcyhrq8jwbu4wpipw66q2sqeb923 --username <your-gooddata-username> --password <your-password> --output src/catalog.json
-import { CatalogHelper } from '@gooddata/react-components';
-import catalogJson from './catalog.json';
-const C = new CatalogHelper(catalogJson);
 
 //define constants for parameter used by components
-const { BarChart, PieChart, LineChart, ColumnChart } = AfmComponents; //current options for charts at good data sdk
+const { BarChart} = AfmComponents; //current options for charts at good data sdk
 const afm = {
     measures: [
         {
@@ -42,7 +38,8 @@ const afm = {
     ]
 };
 const transformation = {};
-const projectId = "la84vcyhrq8jwbu4wpipw66q2sqeb923";
+const projectId = "la84vcyhrq8jwbu4wpipw66q2sqeb923"; //GoodData sample project ID
+//const projectId = "xxs0z4goly0aisusjzyl1m1tmvzfiyuo"; //Zalando sample project ID
 
 
 //start the app
@@ -56,6 +53,10 @@ class App extends Component {
     }
 
     componentDidMount() {
+        // load data from Zalando domain
+
+       // config.setCustomDomain('https://zalando-development.eu.gooddata.com');
+
         //connect directly to the project data layer
         const adapter = new SimpleExecutorAdapter(sdk, projectId);
         const dataTable = new DataTable(adapter);
@@ -110,9 +111,7 @@ class App extends Component {
         const node = this.node
         const size =[400,400]
         const valueMax = max(this.state.values)
-        const barWidth = size[0]/this.state.values.length
         const margin = {top: 20, right:20, bottom:30, left:40}
-
         const yScale = scaleLinear()
             .domain([0,valueMax])
             .range([size[1],0])
@@ -120,6 +119,9 @@ class App extends Component {
         const xScale = scaleBand()
             .domain(this.state.labels)
             .range([margin.left, size[0] - margin.right])
+            .padding(0.2)
+
+        const barWidth = min([xScale.bandwidth(),margin.left])
 
         const yAxis = axisLeft(yScale)
         const xAxis = axisBottom(xScale)
@@ -129,10 +131,10 @@ class App extends Component {
             .data(this.state.values)
             .enter()
             .append('rect')
-            .attr('x', (d,i) => margin.left * 2 + i * barWidth)
+            .attr('x', (d,i) => margin.left * 2 + i * barWidth * 2)
             .attr('y', d => yScale(d))
             .attr('height', d => yScale(0) - yScale(d))
-            .attr('width', barWidth/2)
+            .attr('width', barWidth)
             .attr('fill', '#fe9922')
 
         select(node)
@@ -153,30 +155,6 @@ class App extends Component {
               <img src={logo} className="App-logo" alt="logo" />
               <h1 className="App-title">Welcome to React, servant!</h1>
             </header>
-
-        {/*    <Execute afm={afm} projectId={projectId}> onLoadingChanged={e=>{}} onError={e=>{}}> //does not work :/
-                  {
-                      (executionResult) => {
-                          console.log(executionResult);
-                      }
-                  }
-              </Execute>
-              <h3>This is a GoodData component for a single KPI: </h3>
-              <Kpi
-                  projectId={projectId}
-                  measure={C.metric('Avg Deal Size')} />
-              <h3>This is a GoodData component for table: </h3>
-              <Visualization
-                  projectId={projectId}
-                  identifier={C.visualization('Revenue by Region')}
-                  config={{
-                      colors: ['rgba(195, 49, 73, 1)', 'rgba(168, 194, 86, 1)'],
-                      legend: {
-                          enabled: true,
-                          position: 'bottom'
-                      }
-                  }}
-              />*/}
               <h3>This is a GoodData raw: </h3>
               {this.state.data ? this.dataObject() : 'not there yet' }
               <h3>This is a GoodData raw as D3Js bar chart: </h3>
@@ -194,22 +172,6 @@ class App extends Component {
                       ]
                   }}
               />
-             {/* <div>
-                  <h3>This is a GoodData component for pie charts: </h3>
-                  <PieChart
-                      afm={afm}
-                      projectId={projectId}
-                      transformation={{
-                          measures: [
-                              {
-                                  id: 'CustomMeasureID',
-                                  title: '# of Activities'
-                              }
-                          ]
-                      }}
-                  />
-              </div>*/}
-
           </div>
         );
     }
