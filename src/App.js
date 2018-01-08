@@ -17,13 +17,12 @@ import { config } from 'gooddata';
 import { AfmComponents } from '@gooddata/react-components';
 import '@gooddata/react-components/styles/css/main.css';
 
-
 //define constants for parameter used by components
 const { BarChart} = AfmComponents; //current options for charts at good data sdk
 const afm = {
     measures: [
         {
-            id: 'Brand',
+            id: 'CustomMeasureID',
             definition: {
                 baseObject: {
                     id: 'acoFUgsTiD6W' // can be referenced from the exported catalog
@@ -33,8 +32,17 @@ const afm = {
     ],
     attributes: [
         {
-            id: 'day.date',
+            id: 'day.date.yyyymmdd',
             type: 'date'
+        }
+    ],
+    filters: [
+        {
+            id: 'day.dataset.dt',
+            type: 'date',
+            intervalType: 'relative',
+            between: [ -2, 0 ],
+            granularity: 'month'
         }
     ]
 };
@@ -82,8 +90,8 @@ class App extends Component {
         //define what to do with callbacks for success and failed data request
         dataTable.onData((data) => {
                 console.log(data);
-                //this.setState({data: data}); //load data from GoodData API into component state
-                //this.assembleDataArray()
+                this.setState({data: data}); //load data from GoodData API into component state
+                this.assembleDataArray()
             }
         );
         dataTable.onError((err) => console.error(err));
@@ -95,9 +103,9 @@ class App extends Component {
     assembleDataArray(){
         const values = []
         const labels = []
-        this.state.data.rawData.map((entry) => {
+        this.state.data.rawData.forEach((entry) => {
             labels.push(entry[0].name)
-            values.push(parseInt(entry[1]))
+            values.push(parseInt(entry[1], 10))
         })
         this.setState({values: values})
         this.setState({labels: labels})
@@ -174,27 +182,29 @@ class App extends Component {
               <h1 className="App-title">Welcome to React, servant!</h1>
             </header>
             <div className="App-body" style={{ display: 'flex', justifyContent: 'space-around'}}>
-                <span className="Custom-Chart" style={{ width: '100%'}}>
+                <div className="Custom-Chart" style={{ width: '100%'}}>
                     <h3>This is a GoodData raw: </h3>
                     {this.state.data ? this.dataObject() : 'not there yet' }
                     <h3>This is a GoodData raw as D3Js bar chart: </h3>
                     {this.state.data? this.renderBarChartD3js() : 'not there yet' }
-                </span>
-                <span className="SDK-Chart" style={{ width: '100%'}}>
+                </div>
+                <div className="SDK-Chart" style={{ width: '100%'}}>
                 <h3>This is a GoodData component for bar charts: </h3>
-                  <BarChart
-                      afm={afm}
-                      projectId= {projectId}
-                      transformation={{
-                          measures: [
-                              {
-                                  id: 'CustomMeasureID',
-                                  title: '# of Activities'
-                              }
-                          ]
-                      }}
-                  />
-                </span>
+                  <div style={{height: 400, width: 600}}>
+                    <BarChart
+                        afm={afm}
+                        projectId= {projectId}
+                        transformation={{
+                            measures: [
+                                {
+                                    id: 'CustomMeasureID',
+                                    title: '# of Activities'
+                                }
+                            ]
+                        }}
+                    />
+                  </div>
+                </div>
             </div>
           </div>
         );
