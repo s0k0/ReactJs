@@ -23,6 +23,29 @@ const { BarChart} = AfmComponents; //current options for charts at good data sdk
 const afm = {
     measures: [
         {
+            id: 'Brand',
+            definition: {
+                baseObject: {
+                    id: 'acoFUgsTiD6W' // can be referenced from the exported catalog
+                }
+            }
+        }
+    ],
+    attributes: [
+        {
+            id: 'day.date',
+            type: 'date'
+        }
+    ]
+};
+const projectId = "xxs0z4goly0aisusjzyl1m1tmvzfiyuo"; //Zalando sample project ID
+
+
+//start the app
+/*const projectId = "la84vcyhrq8jwbu4wpipw66q2sqeb923"; //GoodData sample project ID
+const afm = {
+    measures: [
+        {
             id: 'CustomMeasureID',
             definition: {
                 baseObject: {
@@ -36,13 +59,8 @@ const afm = {
             id: 'label.activity.type'
         }
     ]
-};
+};*/
 const transformation = {};
-const projectId = "la84vcyhrq8jwbu4wpipw66q2sqeb923"; //GoodData sample project ID
-//const projectId = "xxs0z4goly0aisusjzyl1m1tmvzfiyuo"; //Zalando sample project ID
-
-
-//start the app
 class App extends Component {
     constructor(props) {
         super(props);
@@ -55,7 +73,7 @@ class App extends Component {
     componentDidMount() {
         // load data from Zalando domain
 
-       // config.setCustomDomain('https://zalando-development.eu.gooddata.com');
+        config.setCustomDomain('https://zalando-development.eu.gooddata.com');
 
         //connect directly to the project data layer
         const adapter = new SimpleExecutorAdapter(sdk, projectId);
@@ -64,8 +82,8 @@ class App extends Component {
         //define what to do with callbacks for success and failed data request
         dataTable.onData((data) => {
                 console.log(data);
-                this.setState({data: data}); //load data from GoodData API into component state
-                this.assembleDataArray()
+                //this.setState({data: data}); //load data from GoodData API into component state
+                //this.assembleDataArray()
             }
         );
         dataTable.onError((err) => console.error(err));
@@ -163,7 +181,7 @@ class App extends Component {
                     {this.state.data? this.renderBarChartD3js() : 'not there yet' }
                 </span>
                 <span className="SDK-Chart" style={{ width: '100%'}}>
-                  <h3>This is a GoodData component for bar charts: </h3>
+                <h3>This is a GoodData component for bar charts: </h3>
                   <BarChart
                       afm={afm}
                       projectId= {projectId}
