@@ -134,7 +134,7 @@ class App extends Component {
 
         const xScale = scaleTime()
             .domain(d3.extent(data, (d) => { return d.date; }))
-            .range([margin.left, width - margin.right])
+            .range([margin.left*3, width - margin.right])
 
         let yAxis = axisLeft(yScale)
         let xAxis = axisBottom(xScale)
@@ -147,12 +147,13 @@ class App extends Component {
 
         console.log(data);
 
-
+        //create container
         select(node)
             .selectAll('svg')
             .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.bottom + margin)
+            .attr("height", height + margin.bottom + margin.top);
 
+        //plot data as line
         select(node)
             .append('path')
             .data([data])
@@ -160,9 +161,10 @@ class App extends Component {
             .attr("stroke", "steelblue")
             .attr("stroke-linejoin", "round")
             .attr("stroke-linecap", "round")
-            .attr("stroke-width", 1.5)
+            .attr("stroke-width", 2)
             .attr("d", line);
 
+        //plot data as dots
         select(node)
             .selectAll(".dot")
             .data(data)
@@ -173,15 +175,30 @@ class App extends Component {
             .attr("fill", "steelblue")
             .attr("r", 5);
 
+        //add y axis with ticks
         select(node)
             .append("g")
-            .attr("transform", "translate("+ margin.left +",0)")
+            .attr("transform", "translate("+ margin.left * 2+",0)")
             .call(yAxis)
 
+        //add x axis with ticks
         select(node)
             .append("g")
             .attr("transform", "translate(0,"+ (height) +")")
             .call(xAxis)
+
+        // now add titles to the axes
+        select(node)
+            .append("text")
+            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+            .attr("transform", "translate( "+ margin.left*.5 + ","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+            .text("GMV in %");
+
+        select(node)
+            .append("text")
+            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+            .attr("transform", "translate("+ (width/2) +","+(height*1.1)+")")  // centre below axis
+            .text("Date(day)");
     }
 
     render() {
