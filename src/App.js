@@ -114,29 +114,27 @@ class App extends Component {
 
     //deliver DOM element containing the bar chart created with D3js from raw data
     renderChartD3js(){
-        return <svg ref={node => this.node = node}
-                    width={500} height={500}>
-
-        </svg>
+        return <svg ref={node => this.node = node} width={600} height={600}></svg>
     }
 
     //create bar chart using D3js
     createChartD3js() {
-        const node = this.node
-        const size =[400,400]
-        const margin = {top: 20, right:20, bottom:30, left:40}
+        const node = this.node;
+        const width = 500;
+        const height = 500;
+        const margin = {top: 20, right:20, bottom:30, left:40};
         const parseTime = d3.timeParse("%Y-%m-%d");
         const data = this.state.data.rawData.map((item) => {
             return { date: parseTime(item[0].name) , value: parseFloat(item[1]).toFixed(5) };
         });
 
         const yScale = scaleLinear()
-            .domain([min(data,(d) => { return d.value; } ), max(data,(d) => { return d.value; } )])
-            .range([size[1],0])
+            .domain([min(data,(d) => { return d.value; } ) * .95 , max(data,(d) => { return d.value; } ) * 1.05])
+            .range([height,0])
 
         const xScale = scaleTime()
             .domain(d3.extent(data, (d) => { return d.date; }))
-            .range([margin.left, size[0] - margin.right])
+            .range([margin.left, width - margin.right])
 
         let yAxis = axisLeft(yScale)
         let xAxis = axisBottom(xScale)
@@ -144,6 +142,7 @@ class App extends Component {
         const line = d3.line()
             .x((d) => { return xScale(d.date); })
             .y((d) => { return yScale(d.value); })
+            .curve(d3.curveMonotoneX);
 
 
         console.log(data);
@@ -151,6 +150,8 @@ class App extends Component {
 
         select(node)
             .selectAll('svg')
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.bottom + margin)
 
         select(node)
             .append('path')
@@ -163,13 +164,23 @@ class App extends Component {
             .attr("d", line);
 
         select(node)
+            .selectAll(".dot")
+            .data(data)
+            .enter().append("circle") // Uses the enter().append() method
+            .attr("class", "dot") // Assign a class for styling
+            .attr("cx", (d) => { return xScale(d.date); })
+            .attr("cy",  (d) => { return yScale(d.value); })
+            .attr("fill", "steelblue")
+            .attr("r", 5);
+
+        select(node)
             .append("g")
             .attr("transform", "translate("+ margin.left +",0)")
             .call(yAxis)
 
         select(node)
             .append("g")
-            .attr("transform", "translate(0,"+ size[0] +")")
+            .attr("transform", "translate(0,"+ (height) +")")
             .call(xAxis)
     }
 
