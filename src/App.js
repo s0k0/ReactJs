@@ -3,7 +3,8 @@ import logo from './logo.svg';
 import './App.css';
 
 //load d3js dependencies
-import { scaleLinear,scaleBand } from 'd3-scale'
+import * as d3 from 'd3'
+import { scaleLinear, scaleTime } from 'd3-scale'
 import { max, min } from 'd3-array'
 import { select } from 'd3-selection'
 import { axisLeft, axisBottom } from 'd3-axis'
@@ -18,11 +19,11 @@ import { AfmComponents } from '@gooddata/react-components';
 import '@gooddata/react-components/styles/css/main.css';
 
 //define constants for parameter used by components
-const { BarChart} = AfmComponents; //current options for charts at good data sdk
+const {  LineChart} = AfmComponents; //current options for charts at good data sdk
 const afm = {
     measures: [
         {
-            id: 'CustomMeasureID',
+            id: 'Brand GMV %',
             definition: {
                 baseObject: {
                     id: 'acoFUgsTiD6W' // can be referenced from the exported catalog
@@ -80,7 +81,6 @@ class App extends Component {
 
     componentDidMount() {
         // load data from Zalando domain
-
         config.setCustomDomain('https://zalando-development.eu.gooddata.com');
 
         //connect directly to the project data layer
@@ -91,24 +91,13 @@ class App extends Component {
         dataTable.onData((data) => {
                 console.log(data);
                 this.setState({data: data}); //load data from GoodData API into component state
-                this.assembleDataArray()
+                this.createChartD3js()
             }
         );
         dataTable.onError((err) => console.error(err));
 
         //executing data request with given attribute-filter-model (afm) format and transformation
         dataTable.getData(afm, transformation);
-    }
-
-    assembleDataArray(){
-        const values = []
-        const labels = []
-        this.state.data.rawData.forEach((entry) => {
-            labels.push(entry[0].name)
-            values.push(parseInt(entry[1], 10))
-        })
-        this.setState({values: values})
-        this.setState({labels: labels})
     }
 
     //deliver DOM element containing raw data provided request results
@@ -124,8 +113,7 @@ class App extends Component {
     }
 
     //deliver DOM element containing the bar chart created with D3js from raw data
-    renderBarChartD3js(){
-        this.createBarChartD3js()
+    renderChartD3js(){
         return <svg ref={node => this.node = node}
                     width={500} height={500}>
 
@@ -133,35 +121,46 @@ class App extends Component {
     }
 
     //create bar chart using D3js
-    createBarChartD3js() {
+    createChartD3js() {
         const node = this.node
         const size =[400,400]
-        const valueMax = max(this.state.values)
         const margin = {top: 20, right:20, bottom:30, left:40}
+        const parseTime = d3.timeParse("%Y-%m-%d");
+        const data = this.state.data.rawData.map((item) => {
+            return { date: parseTime(item[0].name) , value: parseFloat(item[1]).toFixed(5) };
+        });
+
         const yScale = scaleLinear()
-            .domain([0,valueMax])
+            .domain([min(data,(d) => { return d.value; } ), max(data,(d) => { return d.value; } )])
             .range([size[1],0])
 
-        const xScale = scaleBand()
-            .domain(this.state.labels)
+        const xScale = scaleTime()
+            .domain(d3.extent(data, (d) => { return d.date; }))
             .range([margin.left, size[0] - margin.right])
-            .padding(0.2)
 
-        const barWidth = min([xScale.bandwidth(),margin.left])
+        let yAxis = axisLeft(yScale)
+        let xAxis = axisBottom(xScale)
 
-        const yAxis = axisLeft(yScale)
-        const xAxis = axisBottom(xScale)
+        const line = d3.line()
+            .x((d) => { return xScale(d.date); })
+            .y((d) => { return yScale(d.value); })
+
+
+        console.log(data);
+
 
         select(node)
-            .selectAll('rect')
-            .data(this.state.values)
-            .enter()
-            .append('rect')
-            .attr('x', (d,i) => margin.left * 2 + i * barWidth * 2)
-            .attr('y', d => yScale(d))
-            .attr('height', d => yScale(0) - yScale(d))
-            .attr('width', barWidth)
-            .attr('fill', '#fe9922')
+            .selectAll('svg')
+
+        select(node)
+            .append('path')
+            .data([data])
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+            .attr("stroke-width", 1.5)
+            .attr("d", line);
 
         select(node)
             .append("g")
@@ -183,25 +182,18 @@ class App extends Component {
             </header>
             <div className="App-body" style={{ display: 'flex', justifyContent: 'space-around'}}>
                 <div className="Custom-Chart" style={{ width: '100%'}}>
-                    <h3>This is a GoodData raw: </h3>
-                    {this.state.data ? this.dataObject() : 'not there yet' }
-                    <h3>This is a GoodData raw as D3Js bar chart: </h3>
-                    {this.state.data? this.renderBarChartD3js() : 'not there yet' }
+                   {/* <h3>This is a GoodData raw: </h3>
+                     {this.state.data ? this.dataObject() : 'not there yet' }*/}
+                    <h3>This is a GoodData raw as D3Js line chart: </h3>
+                    {this.state.data? this.renderChartD3js() : 'not there yet' }
                 </div>
                 <div className="SDK-Chart" style={{ width: '100%'}}>
-                <h3>This is a GoodData component for bar charts: </h3>
+                <h3>This is a GoodData component for line chart: </h3>
                   <div style={{height: 400, width: 600}}>
-                    <BarChart
+                    <LineChart
                         afm={afm}
                         projectId= {projectId}
-                        transformation={{
-                            measures: [
-                                {
-                                    id: 'CustomMeasureID',
-                                    title: '# of Activities'
-                                }
-                            ]
-                        }}
+                        transformation={{}}
                     />
                   </div>
                 </div>
