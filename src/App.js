@@ -112,15 +112,15 @@ class App extends Component {
         })
     }
 
-    //deliver DOM element containing the bar chart created with D3js from raw data
+    //deliver DOM element container for the bar chart created with D3js from raw data
     renderChartD3js(){
-        return <svg ref={node => this.node = node} width={600} height={600}></svg>
+        return <svg ref={node => this.node = node} width={800} height={600}></svg>
     }
 
     //create bar chart using D3js
     createChartD3js() {
         const node = this.node;
-        const width = 500;
+        const width = 700;
         const height = 500;
         const margin = {top: 20, right:20, bottom:30, left:40};
         const parseTime = d3.timeParse("%Y-%m-%d");
@@ -137,7 +137,7 @@ class App extends Component {
             .range([margin.left*3, width - margin.right])
 
         let yAxis = axisLeft(yScale)
-        let xAxis = axisBottom(xScale)
+        let xAxis = axisBottom(xScale).ticks(data.length).tickFormat(d3.timeFormat("%Y-%m-%d"))
 
         const line = d3.line()
             .x((d) => { return xScale(d.date); })
@@ -178,7 +178,7 @@ class App extends Component {
         //add y axis with ticks
         select(node)
             .append("g")
-            .attr("transform", "translate("+ margin.left * 2+",0)")
+            .attr("transform", "translate("+ margin.left * 3+",0)")
             .call(yAxis)
 
         //add x axis with ticks
@@ -186,18 +186,25 @@ class App extends Component {
             .append("g")
             .attr("transform", "translate(0,"+ (height) +")")
             .call(xAxis)
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", function(d) {
+                return "rotate(-90)"
+            });
 
         // now add titles to the axes
         select(node)
             .append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate( "+ margin.left*.5 + ","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+            .attr("transform", "translate( "+ margin.left*1.5 + ","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
             .text("GMV in %");
 
         select(node)
             .append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate("+ (width/2) +","+(height*1.1)+")")  // centre below axis
+            .attr("transform", "translate("+ (width/2) +","+(height*1.15)+")")  // centre below axis
             .text("Date(day)");
     }
 
