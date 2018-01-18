@@ -42,7 +42,7 @@ const afm = {
             id: 'day.dataset.dt',
             type: 'date',
             intervalType: 'relative',
-            between: [ -2, 0 ],
+            between: [ -6, 0 ], //request data from left to right limit in units of granularity
             granularity: 'month'
         }
     ]
@@ -124,9 +124,9 @@ class App extends Component {
         const height = 500;
         const margin = {top: 20, right:20, bottom:30, left:40};
         const parseTime = d3.timeParse("%Y-%m-%d");
-        const data = this.state.data.rawData.map((item) => {
-            return { date: parseTime(item[0].name) , value: parseFloat(item[1]).toFixed(5) };
-        });
+        let data = this.state.data.rawData.map((item) => {
+                return { date: parseTime(item[0].name) , value: parseFloat(item[1]).toFixed(5) };
+            });
 
         const yScale = scaleLinear()
             .domain([min(data,(d) => { return d.value; } ) * .95 , max(data,(d) => { return d.value; } ) * 1.05])
@@ -136,8 +136,8 @@ class App extends Component {
             .domain(d3.extent(data, (d) => { return d.date; }))
             .range([margin.left*3, width - margin.right])
 
-        let yAxis = axisLeft(yScale)
-        let xAxis = axisBottom(xScale).ticks(data.length).tickFormat(d3.timeFormat("%Y-%m-%d"))
+        const yAxis = axisLeft(yScale)
+        const xAxis = axisBottom(xScale).ticks(min([data.length, margin.right])).tickFormat(d3.timeFormat("%Y-%m-%d"))
 
         const line = d3.line()
             .x((d) => { return xScale(d.date); })
@@ -194,7 +194,7 @@ class App extends Component {
                 return "rotate(-90)"
             });
 
-        // now add titles to the axes
+        //add titles to axes
         select(node)
             .append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
@@ -217,10 +217,10 @@ class App extends Component {
             </header>
             <div className="App-body" style={{ display: 'flex', justifyContent: 'space-around'}}>
                 <div className="Custom-Chart" style={{ width: '100%'}}>
-                   {/* <h3>This is a GoodData raw: </h3>
-                     {this.state.data ? this.dataObject() : 'not there yet' }*/}
                     <h3>This is a GoodData raw as D3Js line chart: </h3>
                     {this.state.data? this.renderChartD3js() : 'not there yet' }
+                   {/* <h3>This is a GoodData raw: </h3>
+                    {this.state.data ? this.dataObject() : 'not there yet' }*/}
                 </div>
                 <div className="SDK-Chart" style={{ width: '100%'}}>
                 <h3>This is a GoodData component for line chart: </h3>
