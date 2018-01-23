@@ -42,7 +42,7 @@ const afm = {
             id: 'day.dataset.dt',
             type: 'date',
             intervalType: 'relative',
-            between: [ -6, 0 ], //request data from left to right limit in units of granularity
+            between: [ -3, 0 ], //request data from left to right limit in units of granularity
             granularity: 'month'
         }
     ]
@@ -114,14 +114,14 @@ class App extends Component {
 
     //deliver DOM element container for the bar chart created with D3js from raw data
     renderChartD3js(){
-        return <svg ref={node => this.node = node} width={800} height={600}></svg>
+        return <svg ref={node => this.node = node} width={600} height={400}></svg>
     }
 
     //create bar chart using D3js
     createChartD3js() {
         const node = this.node;
-        const width = 700;
-        const height = 500;
+        const width = 550;
+        const height = 300;
         const margin = {top: 20, right:20, bottom:30, left:40};
         const parseTime = d3.timeParse("%Y-%m-%d");
         let data = this.state.data.rawData.map((item) => {
@@ -204,7 +204,7 @@ class App extends Component {
         select(node)
             .append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate("+ (width/2) +","+(height*1.15)+")")  // centre below axis
+            .attr("transform", "translate("+ (width/2 + margin.left) +","+(height*1.3)+")")  // centre below axis
             .text("Date(day)");
     }
 
