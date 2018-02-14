@@ -1,7 +1,21 @@
+# React Dummy App with GoodData SDK plugin
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>
-You can find the most recent version of this guide [here](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md).
+You can find the most recent version of this guide [here](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md). 
+
+## Context
+
+This react app is a test dummy to get familiar with React and serves as a container for the SDK plugin provided by GoodData (see references https://www.gooddata.com/ ). If you want to recreate it, follow the tutorial by GoodDatas documentation [here](https://help.gooddata.com/display/bHsp5IhQjuz0e6HS0s76/How+to+Create+Your+First+Visualization+with+GoodData+UI+SDK)
+
+## How to run
+Start the sample app under https://localhost:3000/  with following command
+```
+HTTPS=true yarn start
+```
+
 
 ## Table of Contents
 
